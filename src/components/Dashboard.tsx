@@ -1,15 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { DB_SCHEMAS, FORM_ORDER, FormId } from "@/lib/schema";
+import { FORM_ORDER, FormId, getSchemas } from "@/lib/schema";
 import { useFormProgressLive } from "@/lib/hooks";
+import { useT } from "@/lib/i18n";
 import Shell from "@/components/Shell";
 
-const descriptions: Record<FormId, string> = {
-  reparatieonderhoud: "Inrichting van CRM, Field Service, Onderhoudsketen en financiële afhandeling voor het reparatieproces.",
-  mutatieonderhoud: "Inrichting van CRM, Field Service, Onderhoudsketen, Inspectic en financiële afhandeling voor mutatieonderhoud.",
-  inkoopregister: "Vastlegging van administratieve inkoop, inkooporders, declaraties en de bijbehorende audittrail.",
-};
+const DESCRIPTIONS = {
+  nl: {
+    reparatieonderhoud: "Inrichting van CRM, Field Service, Onderhoudsketen en financiële afhandeling voor het reparatieproces.",
+    mutatieonderhoud: "Inrichting van CRM, Field Service, Onderhoudsketen, Inspectic en financiële afhandeling voor mutatieonderhoud.",
+    inkoopregister: "Vastlegging van administratieve inkoop, inkooporders, declaraties en de bijbehorende audittrail.",
+  },
+  en: {
+    reparatieonderhoud: "Configuration of CRM, Field Service, the maintenance chain, and financial processing for the repair process.",
+    mutatieonderhoud: "Configuration of CRM, Field Service, the maintenance chain, Inspectic, and financial processing for turnover maintenance.",
+    inkoopregister: "Recording of administrative procurement, purchase orders, expense claims, and the associated audit trail.",
+  },
+} satisfies Record<"nl" | "en", Record<FormId, string>>;
 
 const ACCENTS: Record<FormId, "rose" | "green" | "slate"> = {
   reparatieonderhoud: "rose",
@@ -24,6 +32,10 @@ const BADGES: Record<FormId, string> = {
 };
 
 export default function Dashboard() {
+  const { lang, t } = useT();
+  const schemas = getSchemas(lang);
+  const descriptions = DESCRIPTIONS[lang];
+
   const progressReparatieonderhoud = useFormProgressLive("reparatieonderhoud");
   const progressMutatieonderhoud = useFormProgressLive("mutatieonderhoud");
   const progressInkoopregister = useFormProgressLive("inkoopregister");
@@ -38,12 +50,8 @@ export default function Dashboard() {
       <div className="hero-banner">
         <div className="hero-icon-circle">🧭</div>
         <div className="hero-content">
-          <div className="hero-title">Onboarding</div>
-          <div className="hero-subtitle">
-            Om uw omgeving goed te kunnen inrichten hebben we een aantal inventarisaties nodig. Doorloop de
-            onderstaande formulieren — uw antwoorden worden automatisch lokaal bewaard en kunnen op elk moment
-            als Excel-bestand worden geëxporteerd voor verdere verwerking.
-          </div>
+          <div className="hero-title">{t.heroTitle}</div>
+          <div className="hero-subtitle">{t.heroSubtitle}</div>
         </div>
         <div className="hero-art" aria-hidden="true">
           <span className="hero-art-shape shape-1" />
@@ -61,7 +69,7 @@ export default function Dashboard() {
 
       <div className="form-grid">
         {FORM_ORDER.map((id) => {
-          const schema = DB_SCHEMAS[id];
+          const schema = schemas[id];
           const pct = progress[id];
           const accent = ACCENTS[id];
           return (
@@ -78,8 +86,8 @@ export default function Dashboard() {
                 <div className="progress-fill" style={{ width: `${pct}%` }} />
               </div>
               <div className="progress-label">
-                <span>{pct}% ingevuld</span>
-                <span>{pct >= 100 ? "✓ Klaar" : "Doorgaan →"}</span>
+                <span>{pct}% {t.percentCompletedSuffix}</span>
+                <span>{pct >= 100 ? t.doneCheck : t.continueLabel}</span>
               </div>
               <div className="form-card-footer">
                 <span className="form-card-badge">{BADGES[id]}</span>

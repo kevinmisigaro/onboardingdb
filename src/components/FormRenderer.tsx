@@ -19,15 +19,17 @@ import {
   loadData,
   saveData,
 } from "@/lib/engine";
+import { useT } from "@/lib/i18n";
 
 function YesNo({ value, onChange }: { value: boolean | undefined; onChange: (v: boolean) => void }) {
+  const { t } = useT();
   return (
     <div className="yesno-group">
       <button type="button" className={`yesno-btn${value === true ? " selected" : ""}`} onClick={() => onChange(true)}>
-        Ja
+        {t.yes}
       </button>
       <button type="button" className={`yesno-btn${value === false ? " selected" : ""}`} onClick={() => onChange(false)}>
-        Nee
+        {t.no}
       </button>
     </div>
   );
@@ -44,6 +46,7 @@ function RepeaterEditor({
   itemLabel?: string;
   onChange: (rows: RepeaterRow[]) => void;
 }) {
+  const { t } = useT();
   function updateRow(idx: number, id: string, val: string | boolean) {
     const next = items.slice();
     next[idx] = { ...next[idx], [id]: val };
@@ -66,9 +69,9 @@ function RepeaterEditor({
         {items.map((item, idx) => (
           <div className="repeater-row" key={idx}>
             <div className="repeater-row-title">
-              {itemLabel || "Item"} {idx + 1}
+              {itemLabel || t.defaultItemLabel} {idx + 1}
             </div>
-            <button type="button" className="repeater-remove" title="Verwijderen" onClick={() => removeRow(idx)}>
+            <button type="button" className="repeater-remove" title={t.remove} onClick={() => removeRow(idx)}>
               ✕
             </button>
             <div className="repeater-grid">
@@ -98,7 +101,7 @@ function RepeaterEditor({
         ))}
       </div>
       <button type="button" className="btn-add" onClick={addRow}>
-        + {itemLabel || "Item"} toevoegen
+        {t.addItem(itemLabel || t.defaultItemLabel)}
       </button>
     </div>
   );
@@ -149,6 +152,20 @@ function YesNoConditionalEditor({
   );
 }
 
+function Select({ options, value, onChange }: { options: string[]; value: string; onChange: (v: string) => void }) {
+  const { t } = useT();
+  return (
+    <select className="input" value={value} onChange={(e) => onChange(e.target.value)}>
+      <option value="">{t.selectPlaceholder}</option>
+      {options.map((opt) => (
+        <option key={opt} value={opt}>
+          {opt}
+        </option>
+      ))}
+    </select>
+  );
+}
+
 function renderInput(field: Field, value: FieldValue, onChange: (v: FieldValue) => void) {
   switch (field.type) {
     case "text":
@@ -160,16 +177,7 @@ function renderInput(field: Field, value: FieldValue, onChange: (v: FieldValue) 
     case "textarea":
       return <textarea className="input" value={(value as string) || ""} onChange={(e) => onChange(e.target.value)} />;
     case "select":
-      return (
-        <select className="input" value={(value as string) || ""} onChange={(e) => onChange(e.target.value)}>
-          <option value="">Maak een keuze...</option>
-          {field.options.map((opt) => (
-            <option key={opt} value={opt}>
-              {opt}
-            </option>
-          ))}
-        </select>
-      );
+      return <Select options={field.options} value={(value as string) || ""} onChange={(v) => onChange(v)} />;
     case "yesno":
       return <YesNo value={value as boolean | undefined} onChange={(v) => onChange(v)} />;
     case "yesno-conditional":
@@ -209,6 +217,7 @@ export default function FormRenderer({
   // exactly; the real, localStorage-backed answers are loaded right after
   // mount, which is the one legitimate case for setting state from an effect
   // (synchronizing with an external system, per React's own guidance).
+  const { lang, t } = useT();
   const [data, setData] = useState<FormData>({});
   const [savedAt, setSavedAt] = useState<number | null>(null);
 
@@ -218,12 +227,12 @@ export default function FormRenderer({
   }, [schema.id]);
 
   useEffect(() => {
-    const t = setTimeout(() => {
+    const timer = setTimeout(() => {
       saveData(schema.id, data);
       setSavedAt(Date.now());
       onProgressChange?.(computeProgress(schema, data));
     }, 400);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [data, schema, onProgressChange]);
 
   function update(id: string, value: FieldValue) {
@@ -248,16 +257,20 @@ export default function FormRenderer({
         <div className="save-indicator">
           {savedAt && (
             <>
-              <span className="dot" /> Automatisch opgeslagen
+              <span className="dot" /> {t.autoSaved}
             </>
           )}
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <Link href="/" className="btn btn-secondary">
-            ← Terug naar overzicht
+            {t.backToOverview}
           </Link>
-          <button type="button" className="btn btn-success" onClick={() => exportFormToExcel(schema, data, getKlantNaam())}>
-            💾 Opslaan
+          <button
+            type="button"
+            className="btn btn-success"
+            onClick={() => exportFormToExcel(schema, data, getKlantNaam(), lang)}
+          >
+            {t.save}
           </button>
         </div>
       </div>

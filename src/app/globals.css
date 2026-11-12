@@ -97,6 +97,36 @@ a { color: inherit; text-decoration: none; }
 }
 .topbar-klant:hover { text-decoration: underline; }
 
+.lang-switch {
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,0.14);
+  border-radius: 999px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.lang-switch-btn {
+  border: none;
+  background: none;
+  color: rgba(255,255,255,0.85);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.lang-switch-btn:hover { color: #fff; }
+
+.lang-switch-btn.active {
+  background: #ffffff;
+  color: var(--db-navy);
+}
+
 .body-area {
   display: flex;
   flex: 1;
