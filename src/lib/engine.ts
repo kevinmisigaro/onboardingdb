@@ -54,7 +54,7 @@ export function setKlantNaam(name: string) {
 
 /* ---------------- Flatten schema+data into Q&A rows (progress + export) ---------------- */
 
-type FlatRow =
+export type FlatRow =
   | { type: "section"; text: string }
   | { type: "label"; text: string }
   | { type: "subheader"; text: string }
@@ -81,7 +81,7 @@ function flattenRepeaterItem(
   });
 }
 
-function flattenField(field: Field, value: FieldValue, rows: FlatRow[], lang: Lang) {
+export function flattenField(field: Field, value: FieldValue, rows: FlatRow[], lang: Lang) {
   switch (field.type) {
     case "text":
     case "number":

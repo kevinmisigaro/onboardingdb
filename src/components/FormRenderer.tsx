@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Field,
   RepeaterSubField,
@@ -11,15 +11,17 @@ import {
 import {
   ConditionalValue,
   FieldValue,
+  FlatRow,
   FormData,
   RepeaterRow,
   computeProgress,
   exportFormToExcel,
+  flattenField,
   getKlantNaam,
   loadData,
   saveData,
 } from "@/lib/engine";
-import { useT } from "@/lib/i18n";
+import { Lang, useT } from "@/lib/i18n";
 
 function YesNo({ value, onChange }: { value: boolean | undefined; onChange: (v: boolean) => void }) {
   const { t } = useT();
@@ -208,6 +210,85 @@ function FieldRow({ field, value, onChange }: { field: Field; value: FieldValue;
   );
 }
 
+/* ---------------- Wizard: one field per page ---------------- */
+
+interface WizardStep {
+  field: Field;
+  sectionIdx: number;
+  sectionTitle: string;
+}
+
+function buildSteps(schema: Schema): WizardStep[] {
+  const steps: WizardStep[] = [];
+  schema.sections.forEach((section, sectionIdx) => {
+    section.fields.forEach((field) => {
+      steps.push({ field, sectionIdx, sectionTitle: section.title });
+    });
+  });
+  return steps;
+}
+
+function ReviewPanel({
+  schema,
+  data,
+  lang,
+  stepIndexByFieldId,
+  onEdit,
+}: {
+  schema: Schema;
+  data: FormData;
+  lang: Lang;
+  stepIndexByFieldId: Record<string, number>;
+  onEdit: (stepIndex: number) => void;
+}) {
+  const { t } = useT();
+  return (
+    <>
+      <div className="card-title">{t.reviewTitle}</div>
+      <div className="card-desc">{t.reviewDesc}</div>
+      {schema.sections.map((section, sIdx) => (
+        <div className="review-section" key={section.title}>
+          <div className="review-section-title">
+            <span className="section-number">{sIdx + 1}</span>
+            {section.title}
+          </div>
+          {section.fields.map((field) => {
+            const rows: FlatRow[] = [];
+            flattenField(field, data[field.id], rows, lang);
+            return (
+              <div className="review-field" key={field.id}>
+                <button
+                  type="button"
+                  className="review-edit-btn"
+                  onClick={() => onEdit(stepIndexByFieldId[field.id])}
+                >
+                  {t.edit}
+                </button>
+                <div className="review-field-rows">
+                  {rows.map((r, i) =>
+                    r.type === "qa" ? (
+                      <div className="review-qa" key={i}>
+                        <span className="review-qa-q">{r.q}</span>
+                        <span className="review-qa-a">
+                          {r.a ? r.a : <em className="review-empty">{t.noAnswer}</em>}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="review-label" key={i}>
+                        {r.text}
+                      </div>
+                    ),
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ))}
+    </>
+  );
+}
+
 export default function FormRenderer({
   schema,
   onProgressChange,
@@ -222,10 +303,22 @@ export default function FormRenderer({
   const { lang, t } = useT();
   const [data, setData] = useState<FormData>({});
   const [savedAt, setSavedAt] = useState<number | null>(null);
+  const [stepIndex, setStepIndex] = useState(0);
+
+  const steps = useMemo(() => buildSteps(schema), [schema]);
+  const totalSteps = steps.length;
+  const stepIndexByFieldId = useMemo(() => {
+    const map: Record<string, number> = {};
+    steps.forEach((s, i) => {
+      map[s.field.id] = i;
+    });
+    return map;
+  }, [steps]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setData(loadData(schema.id));
+    setStepIndex(0);
   }, [schema.id]);
 
   useEffect(() => {
@@ -241,21 +334,23 @@ export default function FormRenderer({
     setData((prev) => ({ ...prev, [id]: value }));
   }
 
-  return (
-    <>
-      {schema.sections.map((section, sIdx) => (
-        <div className="card" key={section.title}>
-          <div className="card-title">
-            <span className="section-number">{sIdx + 1}</span>
-            {section.title}
-          </div>
-          {section.fields.map((field) => (
-            <FieldRow key={field.id} field={field} value={data[field.id]} onChange={(v) => update(field.id, v)} />
-          ))}
-        </div>
-      ))}
+  function goToStep(i: number) {
+    setStepIndex(Math.max(0, Math.min(i, totalSteps)));
+  }
 
-      <div className="form-footer">
+  const isReview = stepIndex >= totalSteps;
+  const current = !isReview ? steps[stepIndex] : null;
+  const wizardProgressPct = totalSteps === 0 ? 100 : Math.round((Math.min(stepIndex, totalSteps) / totalSteps) * 100);
+
+  return (
+    <div className="wizard">
+      <div className="wizard-meta">
+        <div className="wizard-meta-left">
+          <span className="wizard-section-label">{isReview ? t.reviewSectionLabel : current!.sectionTitle}</span>
+          <span className="wizard-step-label">
+            {isReview ? t.reviewTitle : `${t.questionLabel} ${stepIndex + 1} ${t.ofLabel} ${totalSteps}`}
+          </span>
+        </div>
         <div className="save-indicator">
           {savedAt && (
             <>
@@ -263,19 +358,55 @@ export default function FormRenderer({
             </>
           )}
         </div>
+      </div>
+
+      <div className="progress-track wizard-progress-track">
+        <div className="progress-fill" style={{ width: `${wizardProgressPct}%` }} />
+      </div>
+
+      <div className="card wizard-card">
+        {isReview ? (
+          <ReviewPanel
+            schema={schema}
+            data={data}
+            lang={lang}
+            stepIndexByFieldId={stepIndexByFieldId}
+            onEdit={goToStep}
+          />
+        ) : (
+          <>
+            <div className="card-title">
+              <span className="section-number">{current!.sectionIdx + 1}</span>
+              {current!.sectionTitle}
+            </div>
+            <FieldRow field={current!.field} value={data[current!.field.id]} onChange={(v) => update(current!.field.id, v)} />
+          </>
+        )}
+      </div>
+
+      <div className="form-footer">
+        <button type="button" className="btn btn-secondary" onClick={() => goToStep(stepIndex - 1)} disabled={stepIndex === 0}>
+          {t.previous}
+        </button>
         <div style={{ display: "flex", gap: 10 }}>
           <Link href="/" className="btn btn-secondary">
             {t.backToOverview}
           </Link>
-          <button
-            type="button"
-            className="btn btn-success"
-            onClick={() => exportFormToExcel(schema, data, getKlantNaam(), lang)}
-          >
-            {t.save}
-          </button>
+          {isReview ? (
+            <button
+              type="button"
+              className="btn btn-success"
+              onClick={() => exportFormToExcel(schema, data, getKlantNaam(), lang)}
+            >
+              {t.save}
+            </button>
+          ) : (
+            <button type="button" className="btn btn-primary" onClick={() => goToStep(stepIndex + 1)}>
+              {stepIndex === totalSteps - 1 ? t.toReview : t.next}
+            </button>
+          )}
         </div>
       </div>
-    </>
+    </div>
   );
 }
