@@ -11,24 +11,28 @@ const DESCRIPTIONS = {
     reparatieonderhoud: "Inrichting van CRM, Field Service, Onderhoudsketen en financiële afhandeling voor het reparatieproces.",
     mutatieonderhoud: "Inrichting van CRM, Field Service, Onderhoudsketen, Inspectic en financiële afhandeling voor mutatieonderhoud.",
     inkoopregister: "Vastlegging van administratieve inkoop, inkooporders, declaraties en de bijbehorende audittrail.",
+    contactcenter: "Inventarisatie van de huidige telefonie, call flows, contact center-functionaliteit en het netwerk voor de inrichting van het contact center.",
   },
   en: {
     reparatieonderhoud: "Configuration of CRM, Field Service, the maintenance chain, and financial processing for the repair process.",
     mutatieonderhoud: "Configuration of CRM, Field Service, the maintenance chain, Inspectic, and financial processing for turnover maintenance.",
     inkoopregister: "Recording of administrative procurement, purchase orders, expense claims, and the associated audit trail.",
+    contactcenter: "Inventory of the current telephony, call flows, contact center functionality, and network for setting up the contact center.",
   },
 } satisfies Record<"nl" | "en", Record<FormId, string>>;
 
-const ACCENTS: Record<FormId, "rose" | "green" | "slate"> = {
+const ACCENTS: Record<FormId, "rose" | "green" | "slate" | "cyan"> = {
   reparatieonderhoud: "rose",
   mutatieonderhoud: "green",
   inkoopregister: "slate",
+  contactcenter: "cyan",
 };
 
 const BADGES: Record<FormId, string> = {
   reparatieonderhoud: "A",
   mutatieonderhoud: "B",
   inkoopregister: "C",
+  contactcenter: "D",
 };
 
 export default function Dashboard() {
@@ -39,10 +43,12 @@ export default function Dashboard() {
   const progressReparatieonderhoud = useFormProgressLive("reparatieonderhoud");
   const progressMutatieonderhoud = useFormProgressLive("mutatieonderhoud");
   const progressInkoopregister = useFormProgressLive("inkoopregister");
+  const progressContactcenter = useFormProgressLive("contactcenter");
   const progress: Record<FormId, number> = {
     reparatieonderhoud: progressReparatieonderhoud,
     mutatieonderhoud: progressMutatieonderhoud,
     inkoopregister: progressInkoopregister,
+    contactcenter: progressContactcenter,
   };
 
   return (
@@ -64,7 +70,6 @@ export default function Dashboard() {
       <div className="process-tree-wrap" aria-hidden="true">
         <div className="process-tree-stem" />
         <div className="process-tree-trunk" />
-        <div className="process-tree-center-drop" />
       </div>
 
       <div className="form-grid">

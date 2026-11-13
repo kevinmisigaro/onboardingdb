@@ -380,31 +380,22 @@ a { color: inherit; text-decoration: none; }
   transform: translateX(-50%);
 }
 
+/* Trunk spans the centres of the two dashboard columns (2x2 card grid). */
 .process-tree-trunk {
   position: absolute;
   top: 20px;
-  left: 16.6667%;
-  right: 16.6667%;
+  left: 25%;
+  right: 25%;
   height: 20px;
   border: 2px solid var(--db-cyan);
   border-bottom: none;
   border-radius: 10px 10px 0 0;
 }
 
-.process-tree-center-drop {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  width: 2px;
-  height: 20px;
-  background: var(--db-cyan);
-  transform: translateX(-50%);
-}
-
 /* ---------- Dashboard cards ---------- */
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
   gap: 18px;
   margin-bottom: 28px;
 }
@@ -462,6 +453,7 @@ a { color: inherit; text-decoration: none; }
 .accent-rose .form-card-art { background: linear-gradient(135deg, #fbe1e1, #f4bdbd); }
 .accent-green .form-card-art { background: linear-gradient(135deg, #dcf2e3, #b9e3c9); }
 .accent-slate .form-card-art { background: linear-gradient(135deg, #dde3f0, #c2cce3); }
+.accent-cyan .form-card-art { background: linear-gradient(135deg, #d9f1fa, #b3e2f3); }
 
 .form-card-body {
   padding: 16px 18px 0 18px;
@@ -524,6 +516,7 @@ a { color: inherit; text-decoration: none; }
 .accent-rose .form-card-badge { background: #d9534f; }
 .accent-green .form-card-badge { background: #2f9e5b; }
 .accent-slate .form-card-badge { background: var(--db-navy); }
+.accent-cyan .form-card-badge { background: var(--db-cyan-dark); }
 
 .form-card-footer-icon { font-size: 15px; flex-shrink: 0; }
 .form-card-footer-label { font-size: 13px; font-weight: 500; color: var(--db-text); flex: 1; min-width: 0; }

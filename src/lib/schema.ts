@@ -8,6 +8,7 @@ export type FieldType =
   | "text"
   | "number"
   | "textarea"
+  | "date"
   | "select"
   | "yesno"
   | "yesno-conditional"
@@ -26,7 +27,7 @@ export interface BaseField {
 }
 
 export interface SimpleField extends BaseField {
-  type: "text" | "number" | "textarea" | "yesno";
+  type: "text" | "number" | "textarea" | "date" | "yesno";
 }
 
 export interface SelectField extends BaseField {
@@ -56,7 +57,7 @@ export interface Section {
   fields: Field[];
 }
 
-export type FormId = "reparatieonderhoud" | "mutatieonderhoud" | "inkoopregister";
+export type FormId = "reparatieonderhoud" | "mutatieonderhoud" | "inkoopregister" | "contactcenter";
 
 export interface Schema {
   id: FormId;
@@ -393,6 +394,110 @@ const DB_SCHEMAS_NL: Record<FormId, Schema> = {
       },
     ],
   },
+
+  contactcenter: {
+    id: "contactcenter",
+    menuLabel: "Contact Center",
+    icon: "🎧",
+    title: "Intake Contact Center",
+    intro:
+      "Doel van deze intake is het in kaart brengen van de huidige telefonie- en contactcenteromgeving, zodat we de overstap naar het nieuwe contact center functioneel, technisch en organisatorisch kunnen voorbereiden. De antwoorden vormen de basis voor de inrichting van nummers, call flows, functionaliteit, netwerk en training.",
+    sections: [
+      {
+        title: "Algemene informatie",
+        fields: [
+          { id: "huidige_provider", type: "text", label: "Huidige provider" },
+          { id: "provider_uptime_sla", type: "text", label: "Uptime-SLA van de provider" },
+          { id: "huidige_pbx", type: "text", label: "Huidige PBX" },
+          { id: "beheerder_pbx", type: "text", label: "Beheerder PBX" },
+          { id: "huidig_contact_center", type: "text", label: "Huidig contact center" },
+          { id: "beheerder_contact_center", type: "text", label: "Beheerder contact center" },
+          { id: "aantal_simultane_voicekanalen", type: "number", label: "Aantal simultane voicekanalen" },
+          { id: "nummerblokken_overzicht", type: "textarea", label: "Overzicht nummerblokken", hint: "Bijvoorbeeld blokken van +31... tot +31.... Bij voorkeur als deliverable aanleveren." },
+          { id: "hebben_alle_users_een_eigen_nummer", type: "yesno", label: "Hebben alle users een eigen nummer?" },
+          { id: "nummertoewijzingen_overzicht", type: "textarea", label: "Overzicht nummertoewijzingen", hint: "Bijvoorbeeld: +31... is het hoofdnummer, +31... is het nummer van user A, enz. Bij voorkeur als deliverable aanleveren." },
+          { id: "worden_verkorte_nummers_gebruikt", type: "yesno", label: "Worden verkorte nummers gebruikt?" },
+          { id: "routering_vrije_nummers", type: "textarea", label: "Routering van vrije nummers", hint: "Bijvoorbeeld: vrije nummers geven een bezettoon, worden doorgeschakeld naar het hoofdnummer of krijgen een boodschap." },
+          { id: "standaard_getoond_nummer_bij_outbound", type: "text", label: "Standaard getoond nummer bij uitgaande gesprekken" },
+          { id: "maandelijks_inkomend_belvolume", type: "number", label: "Maandelijks inkomend belvolume", hint: "Bij voorkeur aan de hand van een factuur." },
+          { id: "maandelijks_uitgaand_belvolume", type: "number", label: "Maandelijks uitgaand belvolume", hint: "Bij voorkeur aan de hand van een factuur." },
+          { id: "internationaal_bellen_van_toepassing", type: "yesno", label: "Is internationaal bellen van toepassing?" },
+          { id: "premium_nummers_toegelaten", type: "yesno", label: "Zijn premium nummers toegestaan?" },
+          { id: "locaties_adressen", type: "textarea", label: "Adressen van de locaties" },
+          { id: "emergency_routing_adres", type: "textarea", label: "Adres voor emergency routing", hint: "Het adres dat aan hulpdiensten wordt doorgegeven." },
+          { id: "totaal_aantal_medewerkers", type: "number", label: "Totaal aantal medewerkers" },
+          { id: "aantal_kcc_medewerkers", type: "number", label: "Aantal KCC-medewerkers" },
+          { id: "hardware_telefoons", type: "textarea", label: "Hardware telefoons", hint: "Bijvoorbeeld bureautelefoons (model), DECT (model), enz." },
+          { id: "special_devices", type: "textarea", label: "Speciale apparaten", hint: "Bijvoorbeeld fax, intercom, alarmsysteem (indien gekoppeld met de PBX), lift, enz." },
+          { id: "mobiele_telefoons_managed_of_byod", type: "text", label: "Mobiele telefoons: managed of BYOD?" },
+          { id: "microsoft_teams_reeds_in_gebruik", type: "yesno", label: "Is Microsoft Teams al in gebruik?" },
+          { id: "huidige_microsoft_licenties", type: "textarea", label: "Huidige Microsoft-licenties", hint: "Bijvoorbeeld Microsoft E3, Microsoft E5, Dynamics 365 Customer Service Enterprise." },
+        ],
+      },
+      {
+        title: "Huidige call flow",
+        fields: [
+          { id: "call_flow_overzicht", type: "textarea", label: "Overzicht call flow", hint: "Bij voorkeur als deliverable aanleveren." },
+          { id: "openingstijden", type: "textarea", label: "Openingstijden" },
+          { id: "beschrijving_call_flow_tijdens_werkuren", type: "textarea", label: "Beschrijving call flow tijdens werkuren", hint: "Niet nodig als dit al in het call flow-overzicht staat." },
+          { id: "beschrijving_call_flow_buiten_werkuren", type: "textarea", label: "Beschrijving call flow buiten werkuren", hint: "Niet nodig als dit al in het call flow-overzicht staat." },
+          { id: "regeling_vakantiedagen", type: "textarea", label: "Regeling voor vakantiedagen" },
+          { id: "regeling_uitzonderlijke_sluiting", type: "textarea", label: "Regeling bij uitzonderlijke sluiting" },
+          { id: "disaster_routing", type: "textarea", label: "Disaster routing" },
+          { id: "doorschakelingen_naar_ketenpartners", type: "textarea", label: "Doorschakelingen naar ketenpartners", hint: "Bijvoorbeeld via het KCC, automatisch, op basis van postcode, enz." },
+        ],
+      },
+      {
+        title: "Huidige functionaliteit",
+        fields: [
+          { id: "voicemail_op_userniveau_aan", type: "yesno", label: "Staat voicemail op userniveau aan?" },
+          { id: "busy_on_busy_regeling", type: "textarea", label: "Busy-on-busy-regeling", hint: "Bijvoorbeeld voicemail als de user in gesprek is, of een tweede gesprek laten binnenkomen." },
+          { id: "klassieke_dtmf_of_conversationele_menus", type: "text", label: "Klassieke DTMF- of conversationele menu's?" },
+          { id: "type_koppeling_met_crm", type: "text", label: "Type koppeling met CRM" },
+          { id: "is_er_nummerherkenning", type: "yesno", label: "Is er nummerherkenning?" },
+          { id: "worden_gesprekken_opgenomen", type: "yesno", label: "Worden gesprekken opgenomen?" },
+          { id: "worden_gesprekken_getranscribeerd", type: "yesno", label: "Worden gesprekken getranscribeerd?" },
+          { id: "worden_gesprekken_samengevat", type: "yesno", label: "Worden gesprekken samengevat?" },
+          { id: "is_er_sentimentanalyse", type: "yesno", label: "Is er sentimentanalyse?" },
+          { id: "wordt_ai_toegepast_als_assistent_voor_kcc", type: "yesno", label: "Wordt AI toegepast als assistent voor het KCC?", hint: "Bijvoorbeeld suggesties of vergelijkbare gesprekken." },
+          { id: "welke_bewaartermijnen_zijn_afgesproken", type: "textarea", label: "Welke bewaartermijnen zijn afgesproken?" },
+          { id: "welke_kanalen_buiten_spraak_zijn_er_omnichannel", type: "textarea", label: "Welke kanalen buiten spraak zijn er (omnichannel)?" },
+          { id: "rapportages_en_wallboarding", type: "textarea", label: "Rapportages en wallboarding", hint: "Bijvoorbeeld native, Effecta, CloudTalk of geen." },
+          { id: "welke_groepen_userprofielen", type: "textarea", label: "Welke groepen userprofielen zijn er?", hint: "Bijvoorbeeld user, supervisor, admin." },
+          { id: "overige_3rd_party_koppelingen_en_features", type: "textarea", label: "Overige third-party koppelingen en features" },
+          { id: "waar_staat_de_kennisbank", type: "text", label: "Waar staat de kennisbank (KB)?", hint: "Bijvoorbeeld website, Dynamics-kennisartikelen, IRIS Beheer." },
+        ],
+      },
+      {
+        title: "Huidig netwerk",
+        fields: [
+          { id: "wie_beheert_het_netwerk", type: "text", label: "Wie beheert het netwerk?" },
+          { id: "up_en_down_profiel_mbit", type: "text", label: "Up-/downprofiel (Mbit)" },
+          { id: "netwerk_connectivity_check_ncc", type: "textarea", label: "Network Connectivity Check (NCC)", hint: "Aan te leveren als deliverable via een netwerkmeting op https://connectivity.office.com/." },
+          { id: "type_firewall", type: "text", label: "Type firewall" },
+          { id: "staan_sip_alg_helpers_uit", type: "yesno", label: "Staan SIP ALG/helpers uit?" },
+          { id: "is_er_een_aparte_vlan_voor_voice", type: "yesno", label: "Is er een aparte VLAN voor voice?" },
+          { id: "staat_dpi_uit_voor_voice", type: "yesno", label: "Staat DPI (Deep Packet Inspection) uit voor voice?" },
+          { id: "is_qos_ingericht_op_netwerk", type: "yesno", label: "Is QoS ingericht op het netwerk?" },
+          { id: "wordt_vpn_gebruikt", type: "yesno", label: "Wordt VPN gebruikt?" },
+          { id: "indien_vpn_is_split_tunnel_ingericht_voor_voice", type: "yesno", label: "Indien VPN: is split-tunnel ingericht voor voice?" },
+          { id: "wordt_gebruik_gemaakt_van_vds", type: "yesno", label: "Wordt gebruikgemaakt van VDS?" },
+          { id: "is_er_redundantie_van_internetlijn", type: "yesno", label: "Is er redundantie van de internetlijn?" },
+          { id: "is_er_een_sbc_en_zo_ja_welke", type: "text", label: "Is er een SBC, en zo ja, welke?" },
+          { id: "beheerder_sbc", type: "text", label: "Beheerder SBC" },
+        ],
+      },
+      {
+        title: "Praktisch",
+        fields: [
+          { id: "einde_contractdatum_huidige_oplossing", type: "date", label: "Einddatum contract huidige oplossing" },
+          { id: "hoeveelheid_afkoop_belminuten", type: "number", label: "Hoeveelheid afgekochte belminuten", hint: "Indien er belminuten zijn afgekocht: hoeveel?" },
+          { id: "gewenste_datum_voor_livegang", type: "date", label: "Gewenste datum voor livegang" },
+          { id: "trainingsmodel", type: "textarea", label: "Trainingsmodel", hint: "Gewenste trainingen, zoals usertraining KCC, usertraining Teams Calling, beheerderstraining, train-the-trainer, enz." },
+        ],
+      },
+    ],
+  },
 };
 
 const DB_SCHEMAS_EN: Record<FormId, Schema> = {
@@ -720,6 +825,110 @@ const DB_SCHEMAS_EN: Record<FormId, Schema> = {
       },
     ],
   },
+
+  contactcenter: {
+    id: "contactcenter",
+    menuLabel: "Contact Center",
+    icon: "🎧",
+    title: "Contact Center Intake",
+    intro:
+      "The purpose of this intake is to map the current telephony and contact center environment, so that we can prepare the move to the new contact center functionally, technically, and organizationally. The answers form the basis for configuring numbers, call flows, functionality, network, and training.",
+    sections: [
+      {
+        title: "General information",
+        fields: [
+          { id: "huidige_provider", type: "text", label: "Current provider" },
+          { id: "provider_uptime_sla", type: "text", label: "Provider uptime SLA" },
+          { id: "huidige_pbx", type: "text", label: "Current PBX" },
+          { id: "beheerder_pbx", type: "text", label: "PBX administrator" },
+          { id: "huidig_contact_center", type: "text", label: "Current contact center" },
+          { id: "beheerder_contact_center", type: "text", label: "Contact center administrator" },
+          { id: "aantal_simultane_voicekanalen", type: "number", label: "Number of simultaneous voice channels" },
+          { id: "nummerblokken_overzicht", type: "textarea", label: "Number block overview", hint: "For example blocks from +31... to +31.... Preferably supplied as a deliverable." },
+          { id: "hebben_alle_users_een_eigen_nummer", type: "yesno", label: "Do all users have their own number?" },
+          { id: "nummertoewijzingen_overzicht", type: "textarea", label: "Number assignment overview", hint: "For example: +31... is the main number, +31... is user A's number, etc. Preferably supplied as a deliverable." },
+          { id: "worden_verkorte_nummers_gebruikt", type: "yesno", label: "Are short (abbreviated) numbers used?" },
+          { id: "routering_vrije_nummers", type: "textarea", label: "Routing of unassigned numbers", hint: "For example: unassigned numbers give a busy tone, are forwarded to the main number, or play a message." },
+          { id: "standaard_getoond_nummer_bij_outbound", type: "text", label: "Default caller ID for outbound calls" },
+          { id: "maandelijks_inkomend_belvolume", type: "number", label: "Monthly inbound call volume", hint: "Preferably based on an invoice." },
+          { id: "maandelijks_uitgaand_belvolume", type: "number", label: "Monthly outbound call volume", hint: "Preferably based on an invoice." },
+          { id: "internationaal_bellen_van_toepassing", type: "yesno", label: "Does international calling apply?" },
+          { id: "premium_nummers_toegelaten", type: "yesno", label: "Are premium-rate numbers allowed?" },
+          { id: "locaties_adressen", type: "textarea", label: "Location addresses" },
+          { id: "emergency_routing_adres", type: "textarea", label: "Emergency routing address", hint: "The address shown to emergency services." },
+          { id: "totaal_aantal_medewerkers", type: "number", label: "Total number of employees" },
+          { id: "aantal_kcc_medewerkers", type: "number", label: "Number of customer contact centre (KCC) employees" },
+          { id: "hardware_telefoons", type: "textarea", label: "Hardware phones", hint: "For example desk phones (model), DECT (model), etc." },
+          { id: "special_devices", type: "textarea", label: "Special devices", hint: "For example fax, intercom, alarm system (if connected to the PBX), elevator, etc." },
+          { id: "mobiele_telefoons_managed_of_byod", type: "text", label: "Mobile phones: managed or BYOD?" },
+          { id: "microsoft_teams_reeds_in_gebruik", type: "yesno", label: "Is Microsoft Teams already in use?" },
+          { id: "huidige_microsoft_licenties", type: "textarea", label: "Current Microsoft licences", hint: "For example Microsoft E3, Microsoft E5, Dynamics 365 Customer Service Enterprise." },
+        ],
+      },
+      {
+        title: "Current call flow",
+        fields: [
+          { id: "call_flow_overzicht", type: "textarea", label: "Call flow overview", hint: "Preferably supplied as a deliverable." },
+          { id: "openingstijden", type: "textarea", label: "Opening hours" },
+          { id: "beschrijving_call_flow_tijdens_werkuren", type: "textarea", label: "Description of the call flow during business hours", hint: "Not needed if already covered in the call flow overview." },
+          { id: "beschrijving_call_flow_buiten_werkuren", type: "textarea", label: "Description of the call flow outside business hours", hint: "Not needed if already covered in the call flow overview." },
+          { id: "regeling_vakantiedagen", type: "textarea", label: "Arrangement for holidays" },
+          { id: "regeling_uitzonderlijke_sluiting", type: "textarea", label: "Arrangement for exceptional closures" },
+          { id: "disaster_routing", type: "textarea", label: "Disaster routing" },
+          { id: "doorschakelingen_naar_ketenpartners", type: "textarea", label: "Call transfers to chain partners", hint: "For example via the KCC, automatically, based on postcode, etc." },
+        ],
+      },
+      {
+        title: "Current functionality",
+        fields: [
+          { id: "voicemail_op_userniveau_aan", type: "yesno", label: "Is voicemail enabled at user level?" },
+          { id: "busy_on_busy_regeling", type: "textarea", label: "Busy-on-busy arrangement", hint: "For example voicemail when the user is on a call, or letting a second call come in." },
+          { id: "klassieke_dtmf_of_conversationele_menus", type: "text", label: "Classic DTMF or conversational menus?" },
+          { id: "type_koppeling_met_crm", type: "text", label: "Type of CRM integration" },
+          { id: "is_er_nummerherkenning", type: "yesno", label: "Is there caller identification?" },
+          { id: "worden_gesprekken_opgenomen", type: "yesno", label: "Are calls recorded?" },
+          { id: "worden_gesprekken_getranscribeerd", type: "yesno", label: "Are calls transcribed?" },
+          { id: "worden_gesprekken_samengevat", type: "yesno", label: "Are calls summarised?" },
+          { id: "is_er_sentimentanalyse", type: "yesno", label: "Is there sentiment analysis?" },
+          { id: "wordt_ai_toegepast_als_assistent_voor_kcc", type: "yesno", label: "Is AI used as an assistant for the KCC?", hint: "For example suggestions or similar calls." },
+          { id: "welke_bewaartermijnen_zijn_afgesproken", type: "textarea", label: "Which retention periods have been agreed?" },
+          { id: "welke_kanalen_buiten_spraak_zijn_er_omnichannel", type: "textarea", label: "Which channels other than voice are there (omnichannel)?" },
+          { id: "rapportages_en_wallboarding", type: "textarea", label: "Reporting and wallboarding", hint: "For example native, Effecta, CloudTalk, or none." },
+          { id: "welke_groepen_userprofielen", type: "textarea", label: "Which groups of user profiles are there?", hint: "For example user, supervisor, admin." },
+          { id: "overige_3rd_party_koppelingen_en_features", type: "textarea", label: "Other third-party integrations and features" },
+          { id: "waar_staat_de_kennisbank", type: "text", label: "Where is the knowledge base (KB) located?", hint: "For example website, Dynamics knowledge articles, IRIS Beheer." },
+        ],
+      },
+      {
+        title: "Current network",
+        fields: [
+          { id: "wie_beheert_het_netwerk", type: "text", label: "Who manages the network?" },
+          { id: "up_en_down_profiel_mbit", type: "text", label: "Up/down profile (Mbit)" },
+          { id: "netwerk_connectivity_check_ncc", type: "textarea", label: "Network Connectivity Check (NCC)", hint: "To be supplied as a deliverable via a network measurement at https://connectivity.office.com/." },
+          { id: "type_firewall", type: "text", label: "Firewall type" },
+          { id: "staan_sip_alg_helpers_uit", type: "yesno", label: "Are SIP ALG/helpers disabled?" },
+          { id: "is_er_een_aparte_vlan_voor_voice", type: "yesno", label: "Is there a separate VLAN for voice?" },
+          { id: "staat_dpi_uit_voor_voice", type: "yesno", label: "Is DPI (Deep Packet Inspection) disabled for voice?" },
+          { id: "is_qos_ingericht_op_netwerk", type: "yesno", label: "Is QoS configured on the network?" },
+          { id: "wordt_vpn_gebruikt", type: "yesno", label: "Is a VPN used?" },
+          { id: "indien_vpn_is_split_tunnel_ingericht_voor_voice", type: "yesno", label: "If VPN: is split tunnelling configured for voice?" },
+          { id: "wordt_gebruik_gemaakt_van_vds", type: "yesno", label: "Is VDS used?" },
+          { id: "is_er_redundantie_van_internetlijn", type: "yesno", label: "Is the internet connection redundant?" },
+          { id: "is_er_een_sbc_en_zo_ja_welke", type: "text", label: "Is there an SBC, and if so, which one?" },
+          { id: "beheerder_sbc", type: "text", label: "SBC administrator" },
+        ],
+      },
+      {
+        title: "Practical",
+        fields: [
+          { id: "einde_contractdatum_huidige_oplossing", type: "date", label: "Contract end date of the current solution" },
+          { id: "hoeveelheid_afkoop_belminuten", type: "number", label: "Number of prepaid call minutes", hint: "If call minutes have been bought off: how many?" },
+          { id: "gewenste_datum_voor_livegang", type: "date", label: "Desired go-live date" },
+          { id: "trainingsmodel", type: "textarea", label: "Training model", hint: "Desired training, such as KCC user training, Teams Calling user training, administrator training, train-the-trainer, etc." },
+        ],
+      },
+    ],
+  },
 };
 
 const DB_SCHEMAS_BY_LANG: Record<Lang, Record<FormId, Schema>> = {
@@ -735,4 +944,4 @@ export function getSchemas(lang: Lang): Record<FormId, Schema> {
 // e.g. progress computation — identical fields/ids in every language.
 export const DB_SCHEMAS = DB_SCHEMAS_NL;
 
-export const FORM_ORDER: FormId[] = ["reparatieonderhoud", "mutatieonderhoud", "inkoopregister"];
+export const FORM_ORDER: FormId[] = ["reparatieonderhoud", "mutatieonderhoud", "inkoopregister", "contactcenter"];

@@ -53,10 +53,12 @@ export default function Shell({ active, progressOverride, children }: ShellProps
   const progressReparatieonderhoud = useFormProgressLive("reparatieonderhoud");
   const progressMutatieonderhoud = useFormProgressLive("mutatieonderhoud");
   const progressInkoopregister = useFormProgressLive("inkoopregister");
+  const progressContactcenter = useFormProgressLive("contactcenter");
   const progressMap: Record<FormId, number> = {
     reparatieonderhoud: progressReparatieonderhoud,
     mutatieonderhoud: progressMutatieonderhoud,
     inkoopregister: progressInkoopregister,
+    contactcenter: progressContactcenter,
   };
 
   const [editingKlant, setEditingKlant] = useState(false);

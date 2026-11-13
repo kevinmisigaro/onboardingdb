@@ -176,6 +176,8 @@ function renderInput(field: Field, value: FieldValue, onChange: (v: FieldValue) 
       );
     case "textarea":
       return <textarea className="input" value={(value as string) || ""} onChange={(e) => onChange(e.target.value)} />;
+    case "date":
+      return <input className="input" type="date" value={(value as string) || ""} onChange={(e) => onChange(e.target.value)} />;
     case "select":
       return <Select options={field.options} value={(value as string) || ""} onChange={(v) => onChange(v)} />;
     case "yesno":

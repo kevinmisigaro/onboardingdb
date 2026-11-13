@@ -86,6 +86,7 @@ function flattenField(field: Field, value: FieldValue, rows: FlatRow[], lang: La
     case "text":
     case "number":
     case "textarea":
+    case "date":
       rows.push({ type: "qa", q: field.label, a: value ? String(value) : "" });
       break;
     case "select":
