@@ -1,0 +1,40 @@
+{
+    "servers": {
+        "ado-remote-mcp": {
+            "url": "https://mcp.dev.azure.com/databalk",
+            "type": "http"
+        },
+        "CRm": {
+            "url": "https://agent365.svc.cloud.microsoft/mcp/environments/d032e742-1cf0-4cd8-b9b3-146233ba7838/servers/msdyn_ServiceMCPServer",
+            "type": "http"
+        },
+        "Dataverse DataBalk": {
+            "url": "https://databalk.crm4.dynamics.com/api/mcp",
+            "type": "http"
+        },
+        "GitHub MCP": {
+            "url": "https://copilot-api.databalk.ghe.com/mcp",
+            "type": "http"
+        },
+        "playwright": {
+            "command": "npx",
+            "args": [
+                "@playwright/mcp@0.0.25",
+                "--browser",
+                "msedge"
+            ]
+        },
+        "chrome-devtools": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "chrome-devtools-mcp@latest"
+            ]
+        },
+        "figma": {
+            "url": "https://mcp.figma.com/mcp",
+            "type": "http"
+        }
+    },
+    "inputs": []
+}
